@@ -1,5 +1,5 @@
-apiVersion: apps/v1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: {{ .Chart.Name }}
 spec:
@@ -13,18 +13,25 @@ spec:
         app: {{ .Chart.Name }}
     spec:
       volumes:
-        - name: index-html
-          configMap:
-            name: '{{ .Chart.Name }}-html'
-            defaultMode: 420  # This will mount our File to the Pod File system
+          - name: index-html
+            configMap:
+              name: '{{ .Chart.Name }}-html'
+              defaultMode: 420
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.containers.image }}:{{ .Values.containers.tag }}"
+        - resources: {}
+          terminationMessagePath: /dev/termination-log
+          name: {{ .Chart.Name }}
           ports:
             - containerPort: {{ .Values.containers.containerPort }}
+              protocol: TCP
+          imagePullPolicy: Always
+          terminationMessagePolicy: File
+          image: {{ .Values.containers.image }}:{{ .Values.containers.tag }}
           volumeMounts:
-            - name: index-html
-              mountPath: /tmp/html  # This will mount the index.html file to the application location
+          - name: index-html
+            mountPath: /tmp/html
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
   strategy:
     type: RollingUpdate
     rollingUpdate:
