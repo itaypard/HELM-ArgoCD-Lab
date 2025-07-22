@@ -1,4 +1,5 @@
 {{- range .Values.deployment }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -32,25 +33,4 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
-{{- end }}
-  ```
-
-service.yaml file
-
-```YAML
-{{- range .Values.deployment }}
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: {{ .name }}
-  name: {{ .name }}
-spec:
-  ports:
-  - port: 8080
-    protocol: TCP
-    targetPort: 8080
-  selector:
-    app: {{ .name }}
 {{- end }}
