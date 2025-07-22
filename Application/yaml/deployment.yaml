@@ -24,7 +24,7 @@ spec:
               protocol: TCP
           imagePullPolicy: IfNotPresent
 # update with the image you build in part 1
-          image: 'quay.io/itay/nodejs:v1'
+          image: 'quay.io/itaypa/nodejs:v1'
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
   strategy:
