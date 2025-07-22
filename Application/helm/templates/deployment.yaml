@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
 spec:
@@ -13,10 +13,11 @@ spec:
         app: {{ .Chart.Name }}
     spec:
       volumes:
-          - name: index-html
-            configMap:
-              name: '{{ .Chart.Name }}-html'
-              defaultMode: 420
+        # This section will create a volume from the ConfigMap
+        - name: index-html
+          configMap:
+            name: '{{ .Chart.Name }}-html'  # ConfigMap name is dynamic based on the chart name
+            defaultMode: 420  # Permission mode for the volume (chmod 644)
       containers:
         - resources: {}
           terminationMessagePath: /dev/termination-log
@@ -28,8 +29,9 @@ spec:
           terminationMessagePolicy: File
           image: {{ .Values.containers.image }}:{{ .Values.containers.tag }}
           volumeMounts:
-          - name: index-html
-            mountPath: /tmp/html
+            # This section will mount the ConfigMap file into the container's filesystem
+            - name: index-html
+              mountPath: /tmp/html  # Path where the file will be mounted inside the container
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
   strategy:
