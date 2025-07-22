@@ -1,8 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: '{{ .Chart.Name }}-html'
+  name: helm-argocd-lab-html
+  namespace: user7-application
   immutable: false
+  labels:
+    app.kubernetes.io/instance: user7-hello-chart
 data:
   index.html: |-
     <html>
