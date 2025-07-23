@@ -15,7 +15,7 @@ spec:
       volumes:
         - name: index-html
           configMap:
-            name: '{{ .Chart.Name }}-html'
+            name: '{{ .Chart.Name }}-html'  # ConfigMap name is dynamic based on the chart name
             defaultMode: 420  # Permission mode for the volume (chmod 644)
       containers:
         - resources: {}
@@ -30,10 +30,36 @@ spec:
           volumeMounts:
             - name: index-html
               mountPath: /tmp/html  # Path where the file will be mounted inside the container
-          # Adding the environment variable to specify the port
+          
+          # Readiness Probe
+          readinessProbe:
+            httpGet:
+              path: /health/readiness  # Path to check readiness
+              port: {{ .Values.containers.containerPort }}  # Port the app is listening to
+              scheme: HTTP
+            initialDelaySeconds: 1  # Delay before the first probe
+            timeoutSeconds: 1  # Timeout for each probe
+            periodSeconds: 10  # Interval between probes
+            successThreshold: 1  # Count to declare success
+            failureThreshold: 3  # Count to declare failure
+
+          # Liveness Probe
+          livenessProbe:
+            httpGet:
+              path: /health/liveliness  # Path to check liveness
+              port: {{ .Values.containers.containerPort }}  # Port the app is listening to
+              scheme: HTTP
+            initialDelaySeconds: 1  # Delay before the first probe
+            timeoutSeconds: 1  # Timeout for each probe
+            periodSeconds: 10  # Interval between probes
+            successThreshold: 1  # Count to declare success
+            failureThreshold: 3  # Count to declare failure
+
+          # Set environment variable for the application port
           env:
             - name: PORT
               value: {{ .Values.containers.containerPort | quote }}  # Dynamically set PORT to containerPort from values.yaml
+
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
   strategy:
