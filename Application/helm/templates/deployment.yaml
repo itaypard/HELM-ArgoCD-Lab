@@ -13,10 +13,9 @@ spec:
         app: {{ .Chart.Name }}
     spec:
       volumes:
-        # This section will create a volume from the ConfigMap
         - name: index-html
           configMap:
-            name: '{{ .Chart.Name }}-html'  # ConfigMap name is dynamic based on the chart name
+            name: '{{ .Chart.Name }}-html'
             defaultMode: 420  # Permission mode for the volume (chmod 644)
       containers:
         - resources: {}
@@ -29,9 +28,12 @@ spec:
           terminationMessagePolicy: File
           image: {{ .Values.containers.image }}:{{ .Values.containers.tag }}
           volumeMounts:
-            # This section will mount the ConfigMap file into the container's filesystem
             - name: index-html
               mountPath: /tmp/html  # Path where the file will be mounted inside the container
+          # Adding the environment variable to specify the port
+          env:
+            - name: PORT
+              value: {{ .Values.containers.containerPort | quote }}  # Dynamically set PORT to containerPort from values.yaml
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
   strategy:
